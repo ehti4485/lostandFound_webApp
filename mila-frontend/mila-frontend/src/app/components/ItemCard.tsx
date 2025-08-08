@@ -10,6 +10,7 @@ interface ItemCardProps {
   imageUrl?: string;
   status: ItemStatus;
   category: ItemCategory;
+  ownerEmail?: string;
 }
 
 const ItemCard: React.FC<ItemCardProps> = ({
@@ -21,6 +22,7 @@ const ItemCard: React.FC<ItemCardProps> = ({
   imageUrl,
   status,
   category,
+  ownerEmail,
 }) => {
   const statusColor = status === ItemStatus.Lost ? 'bg-red-500' : 'bg-green-500';
 
@@ -42,6 +44,7 @@ const ItemCard: React.FC<ItemCardProps> = ({
             <p><strong>Location:</strong> {location}</p>
             <p><strong>Date:</strong> {new Date(date).toLocaleDateString()}</p>
             <p><strong>Category:</strong> {category}</p>
+            {ownerEmail && <p><strong>Owner:</strong> {ownerEmail}</p>}
           </div>
         </div>
       </div>

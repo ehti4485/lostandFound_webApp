@@ -21,6 +21,27 @@ export default function NewItemPage() {
   const [ownerEmail, setOwnerEmail] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [imagePreview, setImagePreview] = useState('');
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const url = e.target.value;
+    setImageUrl(url);
+    
+    // Validate image URL and set preview
+    if (url && (url.endsWith('.jpg') || url.endsWith('.jpeg') || url.endsWith('.png') || url.endsWith('.gif'))) {
+      setImagePreview(url);
+    } else if (url) {
+      // If URL doesn't end with image extension, show error
+      setError('Please enter a valid image URL ending with .jpg, .jpeg, .png, or .gif');
+      setImagePreview('');
+    } else {
+      setImagePreview('');
+      // Clear error if URL is empty
+      if (error?.includes('image URL')) {
+        setError(null);
+      }
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -39,9 +60,17 @@ export default function NewItemPage() {
         uniqueIdentifier,
         ownerEmail,
       };
+      console.log('DEBUG: Form submission - newItem data:', newItem);
+      console.log('DEBUG: Form submission - individual fields:', {
+        status, category, title, description, location, date, imageUrl, uniqueIdentifier, ownerEmail
+      });
+      
       await createItem(newItem);
       router.push('/');
     } catch (err: any) {
+      console.error('DEBUG: Form submission error:', err);
+      console.error('DEBUG: Error message:', err.message);
+      console.error('DEBUG: Full error object:', err);
       setError(err.message || 'An unknown error occurred');
     } finally {
       setLoading(false);
@@ -168,10 +197,27 @@ export default function NewItemPage() {
             id="imageUrl"
             className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
             value={imageUrl}
-            onChange={(e) => setImageUrl(e.target.value)}
+            onChange={handleImageChange}
             placeholder="e.g., https://example.com/item-image.jpg"
           />
+          <p className="text-gray-500 text-xs italic mt-1">Paste image URL (e.g. of lost phone, ID card, etc.)</p>
         </div>
+        
+        {/* Image Preview */}
+        {imagePreview && (
+          <div className="mb-4">
+            <label className="block text-gray-700 text-sm font-bold mb-2">Image Preview:</label>
+            <img
+              src={imagePreview}
+              alt="Preview"
+              className="max-w-full h-64 object-contain border rounded-md"
+              onError={(e) => {
+                // If image fails to load, remove preview
+                setImagePreview('');
+              }}
+            />
+          </div>
+        )}
 
         <div className="mb-6">
           <label htmlFor="ownerEmail" className="block text-gray-700 text-sm font-bold mb-2">Your Email:</label>

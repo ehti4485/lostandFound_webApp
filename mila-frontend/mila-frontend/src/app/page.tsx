@@ -29,6 +29,11 @@ export default async function Home() {
             I Found Something
           </button>
         </Link>
+        <Link href="/items">
+          <button className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg text-lg transition duration-300">
+            Browse Items
+          </button>
+        </Link>
       </div>
 
       <h2 className="text-3xl font-semibold text-center my-8">Recently Found Items</h2>
@@ -47,6 +52,7 @@ export default async function Home() {
               imageUrl={item.imageUrl}
               status={item.status}
               category={item.category}
+              ownerEmail={item.ownerEmail}
             />
           ))}
         </div>

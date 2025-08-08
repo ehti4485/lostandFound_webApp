@@ -26,7 +26,7 @@ export interface Item {
   date: string;
   imageUrl?: string;
   uniqueIdentifier?: string;
-  ownerEmail: string;
+  ownerEmail?: string;
   isMatched: boolean;
   createdAt: string;
   updatedAt: string;

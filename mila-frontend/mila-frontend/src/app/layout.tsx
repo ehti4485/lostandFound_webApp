@@ -33,6 +33,7 @@ export default function RootLayout({
             <div className="space-x-4">
               <a href="/" className="hover:underline">Home</a>
               <a href="/items/new" className="hover:underline">Post Item</a>
+              <a href="/dashboard" className="hover:underline">Dashboard</a>
             </div>
           </div>
         </nav>

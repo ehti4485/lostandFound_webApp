@@ -1,5 +1,5 @@
 import { Item, IItem, ItemStatus } from '../models/item.model';
-// import { detectLabels } from './vision.service'; // Temporarily disabled for demo
+import { analyzeWithGroq } from './vision.service'; // Import the new Groq-based function
 
 // HOW-TO-USE: This function is called every time a new item is created.
 // It takes the newly created item and searches the database for potential matches.
@@ -28,7 +28,45 @@ export async function findMatches(newItem: IItem) {
     }
   }
 
-  // 2. Medium-Confidence Match: Category, Location, and Keywords
+  // 2. AI-Powered Match (Image Recognition with Groq)
+  // Use Groq to extract identifiers from the image and description
+  if (newItem.imageUrl) {
+    try {
+      console.log('Analyzing image with Groq for item:', newItem.title);
+      const identifiers = await analyzeWithGroq(
+        newItem.imageUrl,
+        `${newItem.title} - ${newItem.description}`,
+        newItem.category
+      );
+      
+      // Search for items with matching identifiers
+      if (identifiers.length > 0) {
+        console.log('Identifiers extracted by Groq:', identifiers);
+        
+        // Create regex patterns for each identifier
+        const identifierPatterns = identifiers.map(id => new RegExp(id, 'i'));
+        
+        // Search for items with matching identifiers
+        const aiMatches = await Item.find({
+          status: targetStatus,
+          isMatched: false,
+          $or: [
+            { uniqueIdentifier: { $in: identifierPatterns } },
+            { title: { $regex: new RegExp(identifiers.join('|'), 'i') } },
+            { description: { $regex: new RegExp(identifiers.join('|'), 'i') } }
+          ]
+        });
+        
+        potentialMatches.push(...aiMatches);
+        console.log(`Found ${aiMatches.length} potential AI-powered matches.`);
+      }
+    } catch (error) {
+      console.error('Error analyzing image with Groq:', error);
+      // Continue with other matching strategies if Groq fails
+    }
+  }
+
+  // 3. Medium-Confidence Match: Category, Location, and Keywords
   // HOW-TO-MODIFY: You can make this logic more advanced by using natural language processing (NLP) libraries to parse keywords.
   const searchTerms = newItem.description.split(' ').filter(term => term.length > 3); // Simple keyword extraction
   const mediumMatches = await Item.find({
@@ -44,16 +82,6 @@ export async function findMatches(newItem: IItem) {
 
   potentialMatches.push(...mediumMatches);
   console.log(`Found ${mediumMatches.length} potential medium-confidence matches.`);
-
-  // 3. AI-Powered Match (Image Recognition)
-  // HOW-TO-USE: This is a placeholder for an external API call.
-  // You would send 'newItem.imageUrl' to a service like Google Vision API.
-  // The service would return a list of visually similar images. You would then find those images in your database.
-  if (newItem.imageUrl) {
-    console.log('AI Image Matching Service temporarily disabled for demo');
-    // TODO: Enable when Google Cloud Vision API is configured
-    // const labels = await detectLabels(newItem.imageUrl);
-  }
   
   // TODO: Trigger notification for all potential matches found.
   // For each match, send an email to newItem.ownerEmail and match.ownerEmail.
