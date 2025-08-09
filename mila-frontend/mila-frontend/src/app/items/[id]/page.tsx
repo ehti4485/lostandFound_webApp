@@ -7,7 +7,7 @@ import { Item, ItemStatus } from '@/lib/types';
 import ItemCard from '@/app/components/ItemCard';
 
 interface ItemDetailPageProps {
-  params: Promise<{ id: string }>;
+  params: { id: string };
 }
 
 export default function ItemDetailPage({ params }: ItemDetailPageProps) {
