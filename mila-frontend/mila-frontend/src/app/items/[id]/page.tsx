@@ -7,7 +7,7 @@ import { Item, ItemStatus } from '@/lib/types';
 import ItemCard from '@/app/components/ItemCard';
 
 interface ItemDetailPageProps {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
 export default function ItemDetailPage({ params }: ItemDetailPageProps) {
@@ -133,7 +133,7 @@ export default function ItemDetailPage({ params }: ItemDetailPageProps) {
             <span className="text-2xl">&times;</span>
           </button>
         </div>
-      )}
+          )}
 
       <div className="max-w-2xl mx-auto bg-white p-8 rounded-lg shadow-md">
         {item.imageUrl && (
